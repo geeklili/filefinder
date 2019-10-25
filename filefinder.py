@@ -23,13 +23,22 @@ from random import Random
 # 指定搜索路径（使用绝对路径）
 SEARCH_DIR = "D:" + os.sep + "Documents"
 SEARCH_DIR = "/Path/To/Your/Directory/"
+SEARCH_DIR = "/Users/xiaodong/Temp/"
+
 # 指定搜索文件类型
 FILE_TYPES = ["pdf", "ppt", "pptx", "docx", "doc"]
+FILE_TYPES = ["pdf"]
+
 # 指定上传FTP服务器IP
-FTP_SERVER_IP = '192.168.1.100'
+FTP_SERVER_IP = '222.195.146.185'
+FTP_SERVER_PORT = 60021
+FTP_USER = 'anonymous' # 匿名用户
+FTP_PASSWD = 'anonymous'
+FTP_CWD = 'upload' # 指定上传路径（该用户必须有写入该路径的权限）
+
 # 指定动作（仅搜索；仅上传；搜索上传）
 ACTION_SEARCH = 1
-ACTION_UPLOAD = 0
+ACTION_UPLOAD = 1
 # -------------------------------------------------------------
 
 # 获取主机名
@@ -122,15 +131,18 @@ def searchFilesToSqlite(dirPath, suffixs):
     conn.close()
     return
     
-def uploadFileToFTP(server_ip):
+def uploadFileToFTP(server_ip, server_port, ftp_user, ftp_passwd, ftp_cmd):
     '''注意：要在本地数据库中对已经上传过的文件status置1；
     判断本地数据库文件是否存在；
     上传至FTP服务器，需配置FTP允许匿名上传文件
     '''
 
     # Open FTP
-    ftp = ftplib.FTP(server_ip)
-    ftp.login()
+    ftp = ftplib.FTP()
+    ftp.connect(server_ip, server_port)
+    
+    ftp.login(user=ftp_user, passwd=ftp_passwd)
+    ftp.cwd(ftp_cmd)
     dir_hostname = getHostname()
 
     # 判断FTP指定目录是否存在，否则创建并进入该目录
@@ -188,7 +200,7 @@ def main():
         searchFilesToSqlite(SEARCH_DIR, FILE_TYPES)
         
     if ACTION_UPLOAD:
-        uploadFileToFTP(server_ip = FTP_SERVER_IP)
+        uploadFileToFTP(server_ip = FTP_SERVER_IP, server_port = FTP_SERVER_PORT, ftp_user=FTP_USER, ftp_passwd=FTP_PASSWD, ftp_cmd=FTP_CWD)
 
 if __name__ == '__main__':
     main()
