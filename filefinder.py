@@ -140,7 +140,6 @@ def uploadFileToFTP(server_ip, server_port, ftp_user, ftp_passwd, ftp_cmd):
     # Open FTP
     ftp = ftplib.FTP()
     ftp.connect(server_ip, server_port)
-    
     ftp.login(user=ftp_user, passwd=ftp_passwd)
     ftp.cwd(ftp_cmd)
     dir_hostname = getHostname()
